@@ -4,6 +4,7 @@
 
 import tkinter as tk
 from tkinter import ttk
+from PIL import Image,ImageTk
 
 class Window(tk.Tk):
     def __init__(self,**kwargs):
@@ -23,7 +24,7 @@ class Window(tk.Tk):
         topFrame = ttk.Frame(mainFrame,height=100)
         topFrame.pack(fill=tk.X)
 
-        ttk.Label(topFrame,text="BMI試算",font=('Helvetica', '20')).pack(pady=20)
+        ttk.Label(topFrame,text="BMI試算",font=('Helvetica', '20')).pack(pady=(80,20))
 
         bottomFrame = ttk.Frame(mainFrame,style='yellow.TFrame')
         bottomFrame.pack(expand=True,fill=tk.BOTH)
@@ -53,13 +54,40 @@ class Window(tk.Tk):
         heightEntry = ttk.Entry(bottomFrame, style='gridEntry.TEntry')
         heightEntry.grid(column=1, row=4, sticky=tk.W, padx=10) #added padx=10
 
-        messageText = tk.Text(bottomFrame, height=5, width=35, state=tk.DISABLED)
+        messageText = tk.Text(bottomFrame, height=5, width=35, state=tk.DISABLED,takefocus=0,bd=0) #takefocus=0,bd=0
         messageText.grid(column=0, row=5, sticky=tk.N+tk.S, columnspan=2)
 
+    #**************這是起點**************************
+        commitFrame = ttk.Frame(bottomFrame)
+        commitFrame.grid(column=0, row=0, columnspan=2)
+
         commitBtn = ttk.Button(bottomFrame, text="計算")
-        commitBtn.grid(column=1, row=6, sticky=tk.W)
-        
-    
+        commitBtn.grid(column=1, row=6, sticky=tk.W) #W是西
+
+        commitBtn = ttk.Button(bottomFrame, text="清除")
+        commitBtn.grid(column=1, row=6, sticky=tk.E)  #E是東      
+
+    #**************這是終點**************************
+
+    #**create logo**
+        logoImage = Image.open('logo.png')
+        resizeImage = logoImage.resize((180,45),Image.LANCZOS)
+        self.logoTkimage = ImageTk.PhotoImage(resizeImage)
+        logoLabel = ttk.Label(self,image=self.logoTkimage, width=180)
+        logoLabel.place(x=40, y=45)
+
+        def press_clear(self) -> None:
+            self.nameStringVar.set("")
+            self.birthStringVar.set("")
+            self.heightIntVar.set(0)
+            self.weightIntVar.set(0)
+            self.messageText.configure(state=tk.NORMAL)
+            self.messageText.delete("1.0",tk.END)
+            self.messageText.configure(state=tk.DISABLED)
+            print("清除")
+
+def close_window(w):
+    w.destroy()   
 
 def main():
     '''
@@ -68,6 +96,8 @@ def main():
     window = Window()
     window.title("BMI計算")
     #window.geometry("400x500")
+    window.resizable(width=False, height=False)
+    window.protocol("WM_DELETE_WINDOW",lambda:close_window(window))
     window.mainloop()
 
 if __name__ == "__main__":
